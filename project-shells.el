@@ -136,13 +136,13 @@ should be a subset of *poject-shells-keys*."
 
 (let ((saved-shell-buffer-list nil)
       (last-shell-name nil))
-  (cl-defun shell-buffer-list ()
+  (cl-defun project-shells--buffer-list ()
     (setf saved-shell-buffer-list
 	  (cl-remove-if-not #'buffer-live-p saved-shell-buffer-list)))
 
-  (cl-defun project-shells-switch (&optional name to-create)
+  (cl-defun project-shells--switch (&optional name to-create)
     (let* ((name (or name last-shell-name))
-	   (buffer-list (shell-buffer-list))
+	   (buffer-list (project-shells--buffer-list))
 	   (buf (when name
 		  (cl-find-if (lambda (b) (string= name (buffer-name b)))
 			      buffer-list))))
@@ -162,13 +162,13 @@ should be a subset of *poject-shells-keys*."
     (interactive)
     (let ((name (or (and last-shell-name (get-buffer last-shell-name)
 			 last-shell-name)
-		    (and (shell-buffer-list)
-			 (buffer-name (first (shell-buffer-list)))))))
+		    (and (project-shells--buffer-list)
+			 (buffer-name (first (project-shells--buffer-list)))))))
       (if name
-	  (project-shells-switch name)
+	  (project-shells--switch name)
 	(message "No more shell buffers!"))))
 
-  (cl-defun project-shells-create (name dir &optional (type 'shell) func)
+  (cl-defun project-shells--create (name dir &optional (type 'shell) func)
     (let ((default-directory (expand-file-name (or dir "~/"))))
       (cl-ecase type
 	(term (ansi-term "/bin/sh"))
@@ -177,52 +177,52 @@ should be a subset of *poject-shells-keys*."
       (push (current-buffer) saved-shell-buffer-list)
       (when func (funcall func)))))
 
-(cl-defun project-shells-create-switch (name dir &optional (type 'shell) func)
-  (unless (project-shells-switch name t)
-    (project-shells-create name dir type func)))
+(cl-defun project-shells--create-switch (name dir &optional (type 'shell) func)
+  (unless (project-shells--switch name t)
+    (project-shells--create name dir type func)))
 
 (cl-defun project-shells-send-shell-command (cmdline)
   (insert cmdline)
   (comint-send-input))
 
-(cl-defun project-shells-project-name ()
+(cl-defun project-shells--project-name ()
   (or project-shells-project-name (funcall project-shells-project-name-func)
       project-shells-empty-project))
 
-(cl-defun project-shells-project-root (proj-name)
+(cl-defun project-shells--project-root (proj-name)
   (if (string= proj-name project-shells-empty-project)
       "~/"
     (or project-shells-project-root
 	(funcall project-shells-project-root-func))))
 
-(cl-defun project-shells-set-histfile-env (val)
+(cl-defun project-shells--set-histfile-env (val)
   (when (and project-shells-histfile-env
 	     project-shells-histfile-name)
     (setenv project-shells-histfile-env val)))
 
-(cl-defun project-shells-escape-sh (str)
+(cl-defun project-shells--escape-sh (str)
   (replace-regexp-in-string
    "\"" "\\\\\""
    (replace-regexp-in-string "\\\\" "\\\\\\\\" str)))
 
-(cl-defun project-shells-command-string (args)
+(cl-defun project-shells--command-string (args)
   (mapconcat
    #'identity
    (cl-loop
     for arg in args
-    collect (concat "\"" (project-shells-escape-sh arg) "\""))
+    collect (concat "\"" (project-shells--escape-sh arg) "\""))
    " "))
 
-(cl-defun project-shells-term-command-string ()
+(cl-defun project-shells--term-command-string ()
   (let* ((prog (or explicit-shell-file-name
 		   (getenv "ESHELL") shell-file-name)))
-    (concat "exec " (project-shells-command-string
+    (concat "exec " (project-shells--command-string
 		     (cons prog project-shells-term-args)) "\n")))
 
 (cl-defun project-shells-activate-for-key (key &optional proj proj-root)
   (let* ((key (replace-regexp-in-string "/" "slash" key))
-	 (proj (or proj (project-shells-project-name)))
-	 (proj-root (or proj-root (project-shells-project-root proj)))
+	 (proj (or proj (project-shells--project-name)))
+	 (proj-root (or proj-root (project-shells--project-root proj)))
 	 (proj-shells (cdr (assoc proj project-shells-setup)))
 	 (shell-info (cdr (assoc key proj-shells)))
 	 (name (or (first shell-info) project-shells-default-shell-name))
@@ -235,19 +235,19 @@ should be a subset of *poject-shells-keys*."
 	 (session-dir (expand-file-name (format "%s/%s" proj key)
 					project-shells-session-root)))
     (mkdir session-dir t)
-    (project-shells-set-histfile-env
+    (project-shells--set-histfile-env
      (expand-file-name project-shells-histfile-name session-dir))
     (unwind-protect
-	(project-shells-create-switch
+	(project-shells--create-switch
 	 shell-name dir type
 	 (lambda ()
 	   (when func
 	     (funcall func session-dir))
 	   (when (eq type 'term)
-	     (term-send-raw-string (project-shells-term-command-string)))
+	     (term-send-raw-string (project-shells--term-command-string)))
 	   (setf project-shells-project-name proj
 		 project-shells-project-root proj-root)))
-      (project-shells-set-histfile-env nil))))
+      (project-shells--set-histfile-env nil))))
 
 (cl-defun project-shells-activate (p)
   "Create or switch to the shell buffer for the key just typed"
