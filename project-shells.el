@@ -44,6 +44,8 @@
 ;; an Emacs program to let my life easier via helping me to manage all
 ;; these shell/terminal buffers.
 
+;;; Code:
+
 (require 'cl-lib)
 
 (defvar-local project-shells-project-name nil)
@@ -51,27 +53,27 @@
 
 ;;; Customization
 (defgroup project-shells nil
-  "Manage shells of projects"
+  "Manage shell buffers of each project"
   :group 'tools
   :link '(url-link :tag "Github" "https://github.com/hying-caritas/project-shells"))
 
 (defcustom project-shells-default-shell-name "sh"
-  "The default shell buffer name"
+  "Default shell buffer name"
   :group 'project-shells
   :type 'string)
 
 (defcustom project-shells-empty-project "-"
-  "Specify the name of the empty project.
+  "Name of the empty project.
 
 This is used to create non-project specific shells."
   :group 'project-shells
   :type 'string)
 
-(defcustom  project-shells-setup `((,project-shells-empty-project .
-				      (("1" .
-					(,project-shells-default-shell-name
-					 "~/" 'shell nil)))))
-  "Specify the setup for shells of each project.
+(defcustom project-shells-setup `((,project-shells-empty-project .
+				   (("1" .
+				     (,project-shells-default-shell-name
+				      "~/" 'shell nil)))))
+  "Configration form for shells of each project.
 
 Including name, initial directory, type, function to intialize,
 etc."
@@ -86,14 +88,15 @@ etc."
 					 (choice :tag "Function" (const nil) function)))))
 
 (defcustom project-shells-keys '("1" "2" "3" "4" "5" "6" "7" "8" "9" "0" "-" "=")
-  "Specify keys for shells, one shell will be created for each key.
+  "Keys used to create shell buffers.
 
-Usually these key will be bound in a non-global keymap."
+One shell will be created for each key.  Usually these key will
+be bound in a non-global keymap."
   :group 'project-shells
   :type '(repeat string))
 
 (defcustom project-shells-term-keys '("-" "=")
-  "Specify keys to create terminal.
+  "Keys used to create terminal buffers.
 
 By default shell mode will be used, but for keys in
 project-shells-term-keys, ansi terminal mode will be used.  This
@@ -102,37 +105,37 @@ should be a subset of *poject-shells-keys*."
   :type '(repeat string))
 
 (defcustom project-shells-project-name-func 'projectile-project-name
-  "Specify function to get project name."
+  "Function to get project name."
   :group 'project-shells
   :type 'function)
 
 (defcustom project-shells-project-root-func 'projectile-project-root
-  "Specify function to get project root directory"
+  "Function to get project root directory"
   :group 'project-shells
   :type 'function)
 
 (defcustom project-shells-histfile-env "HISTFILE"
-  "Specify environment variable to set shell history file"
+  "Environment variable to set shell history file"
   :group 'project-shells
   :type 'string)
 
 (defcustom project-shells-histfile-name ".shell_history"
-  "Specify shell history file name"
+  "Shell history file name used to set environment variable"
   :group 'project-shells
   :type 'string)
 
 (defcustom project-shells-term-args nil
-  "Specify shell argument used in terminal"
+  "Shell arguments used in terminal"
   :group 'project-shells
   :type 'string)
 
 (let ((saved-shell-buffer-list nil)
-      (last-shell-name))
+      (last-shell-name nil))
   (cl-defun shell-buffer-list ()
     (setf saved-shell-buffer-list
 	  (cl-remove-if-not #'buffer-live-p saved-shell-buffer-list)))
+
   (cl-defun project-shells-switch (&optional name to-create)
-    (interactive "bShell: ")
     (let* ((name (or name last-shell-name))
 	   (buffer-list (shell-buffer-list))
 	   (buf (when name
@@ -148,7 +151,9 @@ should be a subset of *poject-shells-keys*."
 	(unless to-create
 	  (message "No such shell: %s" name)
 	  nil))))
+
   (cl-defun project-shells-switch-to-last ()
+    "Switch to last shell buffer"
     (interactive)
     (let ((name (or (and last-shell-name (get-buffer last-shell-name)
 			 last-shell-name)
@@ -157,11 +162,12 @@ should be a subset of *poject-shells-keys*."
       (if name
 	  (project-shells-switch name)
 	(message "No more shell buffers!"))))
+
   (cl-defun project-shells-create (name dir &optional (type 'shell) func)
     (let ((default-directory (expand-file-name (or dir "~/"))))
       (cl-ecase type
-	('term (ansi-term "/bin/sh"))
-	('shell (shell)))
+	(term (ansi-term "/bin/sh"))
+	(shell (shell)))
       (rename-buffer name)
       (push (current-buffer) saved-shell-buffer-list)
       (when func (funcall func)))))
