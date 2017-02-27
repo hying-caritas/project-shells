@@ -104,6 +104,11 @@ should be a subset of *poject-shells-keys*."
   :group 'project-shells
   :type '(repeat string))
 
+(defcustom project-shells-session-root "~/.sessions"
+  "The root directory for the shell sessions."
+  :group 'project-shells
+  :type 'string)
+
 (defcustom project-shells-project-name-func 'projectile-project-name
   "Function to get project name."
   :group 'project-shells
@@ -226,7 +231,8 @@ should be a subset of *poject-shells-keys*."
 		       'term 'shell)))
 	 (func (fourth shell-info))
 	 (shell-name (format "*%s.%s.%s*" key name proj))
-	 (session-dir (expand-file-name (format "~/.sessions/%s/%s" proj key))))
+	 (session-dir (expand-file-name (format "%s/%s" proj key)
+					project-shells-session-root)))
     (mkdir session-dir t)
     (project-shells-set-histfile-env
      (format "%s/%s" session-dir project-shells-histfile-name))
