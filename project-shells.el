@@ -219,8 +219,9 @@ should be a subset of *poject-shells-keys*."
     (concat "exec " (project-shells-command-string
 		     (cons prog project-shells-term-args)) "\n")))
 
-(cl-defun project-shells-activate (key &optional proj proj-root)
-  (let* ((proj (or proj (project-shells-project-name)))
+(cl-defun project-shells-activate-for-key (key &optional proj proj-root)
+  (let* ((key (replace-regexp-in-string "/" "slash" key))
+	 (proj (or proj (project-shells-project-name)))
 	 (proj-root (or proj-root (project-shells-project-root proj)))
 	 (proj-shells (cdr (assoc proj project-shells-setup)))
 	 (shell-info (cdr (assoc key proj-shells)))
@@ -235,28 +236,34 @@ should be a subset of *poject-shells-keys*."
 					project-shells-session-root)))
     (mkdir session-dir t)
     (project-shells-set-histfile-env
-     (format "%s/%s" session-dir project-shells-histfile-name))
-    (project-shells-create-switch
-     shell-name dir type
-     (lambda ()
-       (when func
-	 (funcall func session-dir))
-       (when (eq type 'term)
-	 (term-send-raw-string (project-shells-term-command-string)))
-       (setf project-shells-project-name proj
-	     project-shells-project-root proj-root)))
-    (project-shells-set-histfile-env nil)))
+     (expand-file-name project-shells-histfile-name session-dir))
+    (unwind-protect
+	(project-shells-create-switch
+	 shell-name dir type
+	 (lambda ()
+	   (when func
+	     (funcall func session-dir))
+	   (when (eq type 'term)
+	     (term-send-raw-string (project-shells-term-command-string)))
+	   (setf project-shells-project-name proj
+		 project-shells-project-root proj-root)))
+      (project-shells-set-histfile-env nil))))
+
+(cl-defun project-shells-activate (p)
+  "Create or switch to the shell buffer for the key just typed"
+  (interactive "p")
+  (let* ((keys (this-command-keys-vector))
+	 (key (seq-subseq keys (1- (seq-length keys))))
+	 (key-desc (key-description key)))
+    (project-shells-activate-for-key
+     key-desc (and (/= p 1) project-shells-empty-project))))
 
 (cl-defun project-shells-setup (map &optional setup)
+  "Configure the project shells with the prefix keymap and the setup"
   (when setup
     (setf project-shells-setup setup))
   (cl-loop
    for key in project-shells-keys
-   do (define-key map (kbd key)
-	(let* ((key key))
-	  (lambda (p)
-	    (interactive "p")
-	    (project-shells-activate
-	     key (and (/= p 1) project-shells-empty-project)))))))
+   do (define-key map (kbd key) 'project-shells-activate)))
 
 (provide 'project-shells)
