@@ -22,9 +22,11 @@ keymap to add project shells key binding.  For example, to use project
 shells with projectile you can put the following forms in your init
 file,
 
+#+BEGIN_SRC emacs-lisp
 (require 'project-shells)
 
 (project-shells-setup projectile-mode-map)
+#+END_SRC
 
 You can add project shells key binding in other keymap too, or you can
 create your own keymap.
