@@ -72,11 +72,15 @@ This is used to create non-project specific shells."
 (defcustom project-shells-setup `((,project-shells-empty-project .
 				   (("1" .
 				     (,project-shells-default-shell-name
-				      "~/" 'shell nil)))))
+				      "~/" shell nil)))))
   "Configration form for shells of each project.
 
-Including name, initial directory, type, function to intialize,
-etc."
+The format of the variable is an alist which maps the project
+name (string) to the project shells configuration.  Which is an
+alist which maps the key (string) to the shell configuration.
+Which is a list of shell name (string), initial
+directory (string), type ('shell or 'term), and intialization
+function (symbol or lambda)."
   :group 'project-shells
   :type '(alist :key-type (string :tag "Project") :value-type
 		(alist :tag "Project setup"
