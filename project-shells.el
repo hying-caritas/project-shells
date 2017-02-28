@@ -158,7 +158,7 @@ should be a subset of *poject-shells-keys*."
 	  nil))))
 
   (cl-defun project-shells-switch-to-last ()
-    "Switch to last shell buffer"
+    "Switch to the last shell buffer."
     (interactive)
     (let ((name (or (and last-shell-name (get-buffer last-shell-name)
 			 last-shell-name)
@@ -182,6 +182,8 @@ should be a subset of *poject-shells-keys*."
     (project-shells--create name dir type func)))
 
 (cl-defun project-shells-send-shell-command (cmdline)
+  "Send the command line to the current (shell) buffer.  Can be
+used in shell initialized function."
   (insert cmdline)
   (comint-send-input))
 
@@ -220,6 +222,8 @@ should be a subset of *poject-shells-keys*."
 		     (cons prog project-shells-term-args)) "\n")))
 
 (cl-defun project-shells-activate-for-key (key &optional proj proj-root)
+  "Create or switch to the shell buffer for the key, the project
+name, and the project root directory."
   (let* ((key (replace-regexp-in-string "/" "slash" key))
 	 (proj (or proj (project-shells--project-name)))
 	 (proj-root (or proj-root (project-shells--project-root proj)))
@@ -259,7 +263,9 @@ should be a subset of *poject-shells-keys*."
      key-desc (and (/= p 1) project-shells-empty-project))))
 
 (cl-defun project-shells-setup (map &optional setup)
-  "Configure the project shells with the prefix keymap and the setup"
+  "Configure the project shells with the prefix keymap and the
+setup, for format of setup, please refer to document of
+project-shells-setup."
   (when setup
     (setf project-shells-setup setup))
   (cl-loop
