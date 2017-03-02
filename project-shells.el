@@ -8,8 +8,8 @@
 ;; Version: 20170222
 ;; Package-Version: 20170222
 ;; Package-Type: simple
-;; Keywords: project, shell, terminal
-;; Package-Requires: ((pkg-info "0.4"))
+;; Keywords: processes, terminals
+;; Package-Requires: ((emacs "24.3"))
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -277,3 +277,5 @@ project-shells-setup."
    do (define-key map (kbd key) 'project-shells-activate)))
 
 (provide 'project-shells)
+
+;;; project-shells.el ends here
