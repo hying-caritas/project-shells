@@ -58,7 +58,7 @@
   :link '(url-link :tag "Github" "https://github.com/hying-caritas/project-shells"))
 
 (defcustom project-shells-default-shell-name "sh"
-  "Default shell buffer name"
+  "Default shell buffer name."
   :group 'project-shells
   :type 'string)
 
@@ -103,7 +103,7 @@ be bound in a non-global keymap."
   "Keys used to create terminal buffers.
 
 By default shell mode will be used, but for keys in
-project-shells-term-keys, ansi terminal mode will be used.  This
+‘project-shells-term-keys’, ansi terminal mode will be used.  This
 should be a subset of *poject-shells-keys*."
   :group 'project-shells
   :type '(repeat string))
@@ -119,22 +119,22 @@ should be a subset of *poject-shells-keys*."
   :type 'function)
 
 (defcustom project-shells-project-root-func 'projectile-project-root
-  "Function to get project root directory"
+  "Function to get project root directory."
   :group 'project-shells
   :type 'function)
 
 (defcustom project-shells-histfile-env "HISTFILE"
-  "Environment variable to set shell history file"
+  "Environment variable to set shell history file."
   :group 'project-shells
   :type 'string)
 
 (defcustom project-shells-histfile-name ".shell_history"
-  "Shell history file name used to set environment variable"
+  "Shell history file name used to set environment variable."
   :group 'project-shells
   :type 'string)
 
 (defcustom project-shells-term-args nil
-  "Shell arguments used in terminal"
+  "Shell arguments used in terminal."
   :group 'project-shells
   :type 'string)
 
