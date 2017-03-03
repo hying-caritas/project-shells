@@ -228,6 +228,7 @@ used in shell initialized function."
     (concat "exec " (project-shells--command-string
 		     (cons prog project-shells-term-args)) "\n")))
 
+;;;###autoload
 (cl-defun project-shells-activate-for-key (key &optional proj proj-root)
   "Create or switch to the shell buffer for the key, the project
 name, and the project root directory."
@@ -260,6 +261,7 @@ name, and the project root directory."
 		 project-shells-project-root proj-root)))
       (project-shells--set-histfile-env nil))))
 
+;;;###autoload
 (cl-defun project-shells-activate (p)
   "Create or switch to the shell buffer for the key just typed"
   (interactive "p")
@@ -269,6 +271,7 @@ name, and the project root directory."
     (project-shells-activate-for-key
      key-desc (and (/= p 1) project-shells-empty-project))))
 
+;;;###autoload
 (cl-defun project-shells-setup (map &optional setup)
   "Configure the project shells with the prefix keymap and the
 setup, for format of setup, please refer to document of
