@@ -9,7 +9,7 @@
 ;; Package-Version: 20170222
 ;; Package-Type: simple
 ;; Keywords: processes, terminals
-;; Package-Requires: ((emacs "24.3"))
+;; Package-Requires: ((emacs "24.3") (seq "2.19"))
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -47,6 +47,9 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'shell)
+(require 'term)
+(require 'seq)
 
 (defvar-local project-shells-project-name nil)
 (defvar-local project-shells-project-root nil)
@@ -167,7 +170,7 @@ should be a subset of *poject-shells-keys*."
     (let ((name (or (and last-shell-name (get-buffer last-shell-name)
 			 last-shell-name)
 		    (and (project-shells--buffer-list)
-			 (buffer-name (first (project-shells--buffer-list)))))))
+			 (buffer-name (cl-first (project-shells--buffer-list)))))))
       (if name
 	  (project-shells--switch name)
 	(message "No more shell buffers!"))))
@@ -233,12 +236,12 @@ name, and the project root directory."
 	 (proj-root (or proj-root (project-shells--project-root proj)))
 	 (proj-shells (cdr (assoc proj project-shells-setup)))
 	 (shell-info (cdr (assoc key proj-shells)))
-	 (name (or (first shell-info) project-shells-default-shell-name))
-	 (dir (or (second shell-info) proj-root))
-	 (type (or (third shell-info)
+	 (name (or (cl-first shell-info) project-shells-default-shell-name))
+	 (dir (or (cl-second shell-info) proj-root))
+	 (type (or (cl-third shell-info)
 		   (if (member key project-shells-term-keys)
 		       'term 'shell)))
-	 (func (fourth shell-info))
+	 (func (cl-fourth shell-info))
 	 (shell-name (format "*%s.%s.%s*" key name proj))
 	 (session-dir (expand-file-name (format "%s/%s" proj key)
 					project-shells-session-root)))
