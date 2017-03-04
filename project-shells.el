@@ -55,6 +55,8 @@
 (defvar-local project-shells-project-name nil)
 (defvar-local project-shells-project-root nil)
 
+(defconst project-shells-eshell-histfile-env "HISTFILE")
+
 ;;; Customization
 (defgroup project-shells nil
   "Manage shell buffers of each project"
@@ -219,10 +221,17 @@ used in shell initialized function."
 	     (funcall project-shells-project-root-func))
 	"~/")))
 
-(cl-defun project-shells--set-histfile-env (val)
-  (when (and project-shells-histfile-env
-	     project-shells-histfile-name)
-    (setenv project-shells-histfile-env val)))
+(cl-defun project-shells--set-shell-env (session-dir)
+  (when project-shells-histfile-name
+    (let ((histfile (expand-file-name project-shells-histfile-name
+				      session-dir)))
+      (when project-shells-histfile-env
+	(setenv project-shells-histfile-env histfile))
+      (setenv project-shells-eshell-histfile-env histfile))))
+
+(cl-defun project-shells--unset-shell-env ()
+  (setenv project-shells-histfile-env nil)
+  (setenv project-shells-eshell-histfile-env nil))
 
 (cl-defun project-shells--command-string (args)
   (mapconcat
@@ -259,8 +268,7 @@ name, and the project root directory."
 	 (session-dir (expand-file-name (format "%s/%s" proj key)
 					project-shells-session-root)))
     (mkdir session-dir t)
-    (project-shells--set-histfile-env
-     (expand-file-name project-shells-histfile-name session-dir))
+    (project-shells--set-shell-env session-dir)
     (unwind-protect
 	(project-shells--create-switch
 	 shell-name dir type
@@ -271,7 +279,7 @@ name, and the project root directory."
 	     (term-send-raw-string (project-shells--term-command-string)))
 	   (setf project-shells-project-name proj
 		 project-shells-project-root proj-root)))
-      (project-shells--set-histfile-env nil))))
+      (project-shells--unset-shell-env))))
 
 ;;;###autoload
 (cl-defun project-shells-activate (p)
