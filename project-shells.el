@@ -49,6 +49,7 @@
 (require 'cl-lib)
 (require 'shell)
 (require 'term)
+(require 'eshell)
 (require 'seq)
 
 (defvar-local project-shells-project-name nil)
@@ -102,11 +103,20 @@ be bound in a non-global keymap."
   :group 'project-shells
   :type '(repeat string))
 
-(defcustom project-shells-term-keys '("-" "=")
+(defcustom project-shells-term-keys '("-")
   "Keys used to create terminal buffers.
 
 By default shell mode will be used, but for keys in
 ‘project-shells-term-keys’, ansi terminal mode will be used.  This
+should be a subset of *poject-shells-keys*."
+  :group 'project-shells
+  :type '(repeat string))
+
+(defcustom project-shells-eshell-keys '("=")
+  "Keys used to create eshell buffers.
+
+By default shell mode will be used, but for keys in
+‘project-shells-eshell-keys’, eshell mode will be used.  This
 should be a subset of *poject-shells-keys*."
   :group 'project-shells
   :type '(repeat string))
@@ -179,7 +189,8 @@ should be a subset of *poject-shells-keys*."
     (let ((default-directory (expand-file-name (or dir "~/"))))
       (cl-ecase type
 	(term (ansi-term "/bin/sh"))
-	(shell (shell)))
+	(shell (shell))
+	(eshell (eshell)))
       (rename-buffer name)
       (push (current-buffer) saved-shell-buffer-list)
       (when func (funcall func)))))
@@ -240,8 +251,10 @@ name, and the project root directory."
 	 (name (or (cl-first shell-info) project-shells-default-shell-name))
 	 (dir (or (cl-second shell-info) proj-root))
 	 (type (or (cl-third shell-info)
-		   (if (member key project-shells-term-keys)
-		       'term 'shell)))
+		   (cond
+		    ((member key project-shells-term-keys) 'term)
+		    ((member key project-shells-eshell-keys) 'eshell)
+		     (t 'shell))))
 	 (func (cl-fourth shell-info))
 	 (shell-name (format "*%s.%s.%s*" key name proj))
 	 (session-dir (expand-file-name (format "%s/%s" proj key)
