@@ -2,49 +2,64 @@
 
 ** Why bother?
 
-This is to manage multiple shell (or terminal) buffers for each
-project.  For example, to develop for Linux kernel, I usually use one
-shell buffer to configure and build kernel, one shell buffer to run
-some git command not supported by magit, one shell buffer to run qemu
-for built kernel, one shell buffer to ssh into guest system to test.
-Different set of commands is used by the shell in each buffer, so each
-shell should have different command history configuration, and for
-some shell, I may need different setup.  And I have several projects
-to work on.  In addition to project specific shell buffers, I want
-some global shell buffers, so that I can use them whichever project I
-am working on.  Project shells is an Emacs program to let my life
-easier via helping me to manage all these shell/terminal buffers.
+This is to manage multiple shell (or terminal, eshell) buffers for
+each project.  For example, to develop for Linux kernel, I usually use
+one shell buffer to configure and build kernel, one shell buffer to
+run some git command not supported by magit, one shell buffer to run
+qemu for built kernel, one shell buffer to ssh into guest system to
+test.  Different set of commands is used by the shell in each buffer,
+so each shell should have different command history configuration, and
+for some shell, I may need different setup.  And I have several
+projects to work on.  In addition to project specific shell buffers, I
+want some global shell buffers, so that I can use them whichever
+project I am working on.  Project shells is an Emacs package to let my
+life easier via helping me to manage all these shell/terminal/eshell
+buffers.
 
-** How to use
+** Install
 
-Firstly, you need to run project-shells-setup, the parameter is the
-keymap to add project shells key binding.  For example, to use project
-shells with projectile you can put the following forms in your init
-file,
+Download the project-shells.el, add its path into emacs load path, and
+load the file.  For example,
 
 #+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path "<directory of project-shells.el>")
 (require 'project-shells)
+#+END_SRC
 
+In your Emacs init file.
+
+** Usage
+
+The package could be setup via call
+src_emacs-lisp{project-shells-setup}, the parameter is the keymap to
+add project shells key binding.  For example, to use project shells
+with projectile you can put the following forms in your init file,
+
+#+BEGIN_SRC emacs-lisp
 (project-shells-setup projectile-mode-map)
 #+END_SRC
 
-You can add project shells key binding in other keymap too, or you can
+You can add project-shells key binding in other keymap too, or you can
 create your own keymap.
 
-After binding the key, you can create or switch to project shells via,
+After binding the key, you can create or switch to the shells via,
 
 <prefix key> <shell key>
 
 The default <shell key>s are "1", "2", "3", "4", "5", "6", "7", "8",
-"9", "0", "-", "=", so you can have 12 shell/terminal buffers for each
-project.  You can customize the number of buffers and keys to activate
-them via project-shells-keys.  By default "1" - "0" will create shell
-buffers, while "-" and "=" will create terminal buffers.
+"9", "0", "-", "=", so you can have 12 shell/terminal/eshell buffers
+for each project.  You can customize the number of buffers and keys to
+activate them via project-shells-keys.  By default "1" - "0" will
+create shell buffers, "-" will create terminal buffers, "=" will
+create eshell buffers.
 
-To create or switch to global shells, you need to use position
+To create or switch to the global shells, you need to use position
 parameter for the <shell key>.  For example,
 
 <prefix key> C-u <shell key>
+
+Use src_emacs-lisp{customize-group} project-shell to change the
+configuration.
 
 ** Work with project management package
 
@@ -52,4 +67,20 @@ You need a project management package enabled, so that project shells
 knows what the current project is and what the project root directory
 is.  The default configuration works with projectile.  To work with
 other project management package, you need to customize
-project-shells-project-name-func and project-shells-project-root-func.
+src_emacs-lisp{project-shells-project-name-func} and
+src_emacs-lisp{project-shells-project-root-func}.
+
+** Shell configuration
+
+In the default configuration, each shell program and eshell runs by
+project-shells will has own history file.  The default history file
+name is "~/.sessions/<project name>/<key>/.shell_history".  The
+default configuration works for bash, to support other shell, the
+src_emacs-lisp{project-shells-histfile-env} may need to be customized.
+
+If some special shell configuration is needed, the shell initialize
+file could be added into the session directory, the default initialize
+file name is "~/.sessions/<project name>/<key>/.shellrc".  The default
+configuration works for bash, to support other shell, the
+src_emacs-lisp{project-shells-default-init-file} may need to be
+customized.
