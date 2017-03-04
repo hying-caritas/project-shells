@@ -5,8 +5,8 @@
 ;; Author: "Huang, Ying" <huang.ying.caritas@gmail.com>
 ;; Maintainer: "Huang, Ying" <huang.ying.caritas@gmail.com>
 ;; URL: https://github.com/hying-caritas/project-shells
-;; Version: 20170222
-;; Package-Version: 20170222
+;; Version: 20170305
+;; Package-Version: 20170305
 ;; Package-Type: simple
 ;; Keywords: processes, terminals
 ;; Package-Requires: ((emacs "24.3") (seq "2.19"))
