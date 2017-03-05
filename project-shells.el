@@ -238,17 +238,24 @@ used in shell initialized function."
 	     (funcall project-shells-project-root-func))
 	"~/")))
 
+(cl-defun project-shells--setenv (env val)
+  (when env
+    (prog1
+	(list (list env (getenv env)))
+      (setenv env val))))
+
 (cl-defun project-shells--set-shell-env (session-dir)
   (when project-shells-histfile-name
     (let ((histfile (expand-file-name project-shells-histfile-name
 				      session-dir)))
-      (when project-shells-histfile-env
-	(setenv project-shells-histfile-env histfile))
-      (setenv project-shells-eshell-histfile-env histfile))))
+      (append
+       (project-shells--setenv project-shells-histfile-env histfile)
+       (project-shells--setenv project-shells-eshell-histfile-env histfile)))))
 
-(cl-defun project-shells--unset-shell-env ()
-  (setenv project-shells-histfile-env nil)
-  (setenv project-shells-eshell-histfile-env nil))
+(cl-defun project-shells--restore-shell-env (saved-env)
+  (cl-loop
+   for env-val in (reverse saved-env)
+   do (apply #'setenv env-val)))
 
 (cl-defun project-shells--command-string (args)
   (mapconcat
@@ -283,9 +290,9 @@ name, and the project root directory."
 	 (func (cl-fourth shell-info))
 	 (shell-name (format "*%s.%s.%s*" key name proj))
 	 (session-dir (expand-file-name (format "%s/%s" proj key)
-					project-shells-session-root)))
+					project-shells-session-root))
+	 (saved-env (project-shells--set-shell-env session-dir)))
     (mkdir session-dir t)
-    (project-shells--set-shell-env session-dir)
     (unwind-protect
 	(project-shells--create-switch
 	 shell-name dir type
@@ -298,7 +305,7 @@ name, and the project root directory."
 	     (funcall project-shells-default-init-func session-dir type))
 	   (when func
 	     (funcall func session-dir))))
-      (project-shells--unset-shell-env))))
+      (project-shells--restore-shell-env saved-env))))
 
 ;;;###autoload
 (cl-defun project-shells-activate (p)
