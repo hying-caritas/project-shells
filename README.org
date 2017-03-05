@@ -19,14 +19,14 @@ buffers.
 ** Install
 
 Download the project-shells.el, add its path into emacs load path, and
-load the file.  For example,
+load the file.  For example, add
 
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path "<directory of project-shells.el>")
 (require 'project-shells)
 #+END_SRC
 
-In your Emacs init file.
+in your Emacs init file.
 
 ** Usage
 
