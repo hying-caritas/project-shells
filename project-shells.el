@@ -195,19 +195,14 @@ should be a subset of poject-shells-keys."
 	  (project-shells--switch name)
 	(message "No more shell buffers!"))))
 
-  (cl-defun project-shells--create (name dir &optional (type 'shell) func)
+  (cl-defun project-shells--create (name dir &optional (type 'shell))
     (let ((default-directory (expand-file-name (or dir "~/"))))
       (cl-ecase type
 	(term (ansi-term "/bin/sh"))
 	(shell (shell))
 	(eshell (eshell)))
       (rename-buffer name)
-      (push (current-buffer) saved-shell-buffer-list)
-      (funcall func))))
-
-(cl-defun project-shells--create-switch (name dir &optional (type 'shell) func)
-  (unless (project-shells--switch name t)
-    (project-shells--create name dir type func)))
+      (push (current-buffer) saved-shell-buffer-list))))
 
 (cl-defun project-shells-send-shell-command (cmdline)
   "Send the command line to the current (shell) buffer.  Can be
@@ -277,35 +272,35 @@ used in shell initialized function."
 name, and the project root directory."
   (let* ((key (replace-regexp-in-string "/" "slash" key))
 	 (proj (or proj (project-shells--project-name)))
-	 (proj-root (or proj-root (project-shells--project-root proj)))
 	 (proj-shells (cdr (assoc proj project-shells-setup)))
 	 (shell-info (cdr (assoc key proj-shells)))
 	 (name (or (cl-first shell-info) project-shells-default-shell-name))
-	 (dir (or (cl-second shell-info) proj-root))
-	 (type (or (cl-third shell-info)
-		   (cond
-		    ((member key project-shells-term-keys) 'term)
-		    ((member key project-shells-eshell-keys) 'eshell)
-		     (t 'shell))))
-	 (func (cl-fourth shell-info))
-	 (shell-name (format "*%s.%s.%s*" key name proj))
-	 (session-dir (expand-file-name (format "%s/%s" proj key)
-					project-shells-session-root))
-	 (saved-env (project-shells--set-shell-env session-dir)))
-    (mkdir session-dir t)
-    (unwind-protect
-	(project-shells--create-switch
-	 shell-name dir type
-	 (lambda ()
-	   (when (eq type 'term)
-	     (term-send-raw-string (project-shells--term-command-string)))
-	   (setf project-shells-project-name proj
-		 project-shells-project-root proj-root)
-	   (when project-shells-default-init-func
-	     (funcall project-shells-default-init-func session-dir type))
-	   (when func
-	     (funcall func session-dir))))
-      (project-shells--restore-shell-env saved-env))))
+	 (shell-name (format "*%s.%s.%s*" key name proj)))
+    (unless (project-shells--switch shell-name t)
+      (let* ((proj-root (or proj-root (project-shells--project-root proj)))
+	     (dir (or (cl-second shell-info) proj-root))
+	     (type (or (cl-third shell-info)
+		       (cond
+			((member key project-shells-term-keys) 'term)
+			((member key project-shells-eshell-keys) 'eshell)
+			(t 'shell))))
+	     (func (cl-fourth shell-info))
+	     (session-dir (expand-file-name (format "%s/%s" proj key)
+					    project-shells-session-root))
+	     (saved-env (project-shells--set-shell-env session-dir)))
+       (unwind-protect
+	   (progn
+	     (mkdir session-dir t)
+	     (project-shells--create shell-name dir type)
+	     (when (eq type 'term)
+	       (term-send-raw-string (project-shells--term-command-string)))
+	     (setf project-shells-project-name proj
+		   project-shells-project-root proj-root)
+	     (when project-shells-default-init-func
+	       (funcall project-shells-default-init-func session-dir type))
+	     (when func
+	       (funcall func session-dir)))
+	 (project-shells--restore-shell-env saved-env))))))
 
 ;;;###autoload
 (cl-defun project-shells-activate (p)
