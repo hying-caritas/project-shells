@@ -220,17 +220,12 @@ used in shell initialized function."
 	     project-shells-histfile-name)
     (setenv project-shells-histfile-env val)))
 
-(cl-defun project-shells--escape-sh (str)
-  (replace-regexp-in-string
-   "\"" "\\\\\""
-   (replace-regexp-in-string "\\\\" "\\\\\\\\" str)))
-
 (cl-defun project-shells--command-string (args)
   (mapconcat
    #'identity
    (cl-loop
     for arg in args
-    collect (concat "\"" (project-shells--escape-sh arg) "\""))
+    collect (concat "\"" (shell-quote-argument arg) "\""))
    " "))
 
 (cl-defun project-shells--term-command-string ()
