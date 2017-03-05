@@ -97,6 +97,9 @@ function (symbol or lambda)."
 					 (choice :tag "Type" (const term) (const shell))
 					 (choice :tag "Function" (const nil) function)))))
 
+(defcustom project-shells-default-init-func 'project-shells-init-sh
+  "Default function to initialize the shell buffer")
+
 (defcustom project-shells-keys '("1" "2" "3" "4" "5" "6" "7" "8" "9" "0" "-" "=")
   "Keys used to create shell buffers.
 
@@ -145,6 +148,11 @@ should be a subset of poject-shells-keys."
 
 (defcustom project-shells-histfile-name ".shell_history"
   "Shell history file name used to set environment variable."
+  :group 'project-shells
+  :type 'string)
+
+(defcustom project-shells-init-file-name ".shellrc"
+  "Shell initialize file name to load at startup"
   :group 'project-shells
   :type 'string)
 
@@ -206,6 +214,15 @@ should be a subset of poject-shells-keys."
 used in shell initialized function."
   (insert cmdline)
   (comint-send-input))
+
+(cl-defun project-shells-init-sh (session-dir type)
+  "Initialize the shell via loading initialize file"
+  (let* ((init-file (concat session-dir "/" project-shells-init-file-name))
+	 (cmdline (concat ". " init-file)))
+    (when (and (not (eq type 'eshell)) (file-exists-p init-file))
+      (cl-ecase type
+	(shell (project-shells-send-shell-command cmdline))
+	(term (term-send-raw-string (concat cmdline "\n")))))))
 
 (cl-defun project-shells--project-name ()
   (or project-shells-project-name
@@ -277,6 +294,8 @@ name, and the project root directory."
 	     (term-send-raw-string (project-shells--term-command-string)))
 	   (setf project-shells-project-name proj
 		 project-shells-project-root proj-root)
+	   (when project-shells-default-init-func
+	     (funcall project-shells-default-init-func session-dir type))
 	   (when func
 	     (funcall func session-dir))))
       (project-shells--unset-shell-env))))
