@@ -206,14 +206,18 @@ used in shell initialized function."
   (comint-send-input))
 
 (cl-defun project-shells--project-name ()
-  (or project-shells-project-name (funcall project-shells-project-name-func)
+  (or project-shells-project-name
+      (and (symbol-function project-shells-project-name-func)
+	   (funcall project-shells-project-name-func))
       project-shells-empty-project))
 
 (cl-defun project-shells--project-root (proj-name)
   (if (string= proj-name project-shells-empty-project)
       "~/"
     (or project-shells-project-root
-	(funcall project-shells-project-root-func))))
+	(and (symbol-function project-shells-project-root-func)
+	     (funcall project-shells-project-root-func))
+	"~/")))
 
 (cl-defun project-shells--set-histfile-env (val)
   (when (and project-shells-histfile-env
