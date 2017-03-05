@@ -149,7 +149,7 @@ should be a subset of *poject-shells-keys*."
 (defcustom project-shells-term-args nil
   "Shell arguments used in terminal."
   :group 'project-shells
-  :type 'string)
+  :type '(repeat string))
 
 (let ((saved-shell-buffer-list nil)
       (last-shell-name nil))
