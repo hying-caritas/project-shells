@@ -195,7 +195,7 @@ should be a subset of poject-shells-keys."
 	(eshell (eshell)))
       (rename-buffer name)
       (push (current-buffer) saved-shell-buffer-list)
-      (when func (funcall func)))))
+      (funcall func))))
 
 (cl-defun project-shells--create-switch (name dir &optional (type 'shell) func)
   (unless (project-shells--switch name t)
@@ -273,12 +273,12 @@ name, and the project root directory."
 	(project-shells--create-switch
 	 shell-name dir type
 	 (lambda ()
-	   (when func
-	     (funcall func session-dir))
 	   (when (eq type 'term)
 	     (term-send-raw-string (project-shells--term-command-string)))
 	   (setf project-shells-project-name proj
-		 project-shells-project-root proj-root)))
+		 project-shells-project-root proj-root)
+	   (when func
+	     (funcall func session-dir))))
       (project-shells--unset-shell-env))))
 
 ;;;###autoload
