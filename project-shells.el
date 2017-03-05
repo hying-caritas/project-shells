@@ -108,7 +108,7 @@ be bound in a non-global keymap."
 
 By default shell mode will be used, but for keys in
 ‘project-shells-term-keys’, ansi terminal mode will be used.  This
-should be a subset of *poject-shells-keys*."
+should be a subset of poject-shells-keys."
   :group 'project-shells
   :type '(repeat string))
 
@@ -117,7 +117,7 @@ should be a subset of *poject-shells-keys*."
 
 By default shell mode will be used, but for keys in
 ‘project-shells-eshell-keys’, eshell mode will be used.  This
-should be a subset of *poject-shells-keys*."
+should be a subset of poject-shells-keys."
   :group 'project-shells
   :type '(repeat string))
 
