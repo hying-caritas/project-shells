@@ -30,10 +30,15 @@ in your Emacs init file.
 
 ** Usage
 
-The package could be setup via call ~project-shells-setup~, the
-parameter is the keymap to add project shells key binding.  For
-example, to use project shells with projectile you can put the
-following forms in your init file,
+To enable the project-shells minor mode globally,
+~global-project-shells-mode~ can be used, or it can enabled in a
+buffer with ~project-shells-mode~.  The default prefix key is "C-c s",
+which can be changed via customizing ~project-shells-keymap-prefix~.
+
+The package could also be setup with enabling minor mode via call
+~project-shells-setup~, the parameter is the keymap to add project
+shells key binding.  For example, to use project shells with
+projectile you can put the following forms in your init file,
 
 #+BEGIN_SRC emacs-lisp
 (project-shells-setup projectile-mode-map)
@@ -42,7 +47,8 @@ following forms in your init file,
 You can add project-shells key binding in other keymap too, or you can
 create your own keymap.
 
-After binding the key, you can create or switch to the shells via,
+After enabling the project-shells minor mode or binding the key, you
+can create or switch to the shell buffers via,
 
 <prefix key> <shell key>
 
