@@ -54,10 +54,10 @@ can create or switch to the shell buffers via,
 
 The default <shell key>s are "1", "2", "3", "4", "5", "6", "7", "8",
 "9", "0", "-", "=", so you can have 12 shell/terminal/eshell buffers
-for each project.  You can customize the number of buffers and keys to
-activate them via project-shells-keys.  By default "1" - "0" will
-create shell buffers, "-" will create terminal buffers, "=" will
-create eshell buffers.
+for each project.  You can change the number of buffers and keys to
+activate them via customizing ~project-shells-keys~.  By default "1" -
+"0" will create shell buffers, "-" will create terminal buffers, "="
+will create eshell buffers.
 
 To create or switch to the global shells, you need to use position
 parameter for the <shell key>.  For example,
