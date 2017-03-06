@@ -30,10 +30,10 @@ in your Emacs init file.
 
 ** Usage
 
-The package could be setup via call
-src_emacs-lisp{project-shells-setup}, the parameter is the keymap to
-add project shells key binding.  For example, to use project shells
-with projectile you can put the following forms in your init file,
+The package could be setup via call ~project-shells-setup~, the
+parameter is the keymap to add project shells key binding.  For
+example, to use project shells with projectile you can put the
+following forms in your init file,
 
 #+BEGIN_SRC emacs-lisp
 (project-shells-setup projectile-mode-map)
@@ -58,8 +58,7 @@ parameter for the <shell key>.  For example,
 
 <prefix key> C-u <shell key>
 
-Use src_emacs-lisp{customize-group} project-shell to change the
-configuration.
+Use ~customize-group~ project-shell to change the configuration.
 
 ** Work with project management package
 
@@ -67,8 +66,8 @@ You need a project management package enabled, so that project shells
 knows what the current project is and what the project root directory
 is.  The default configuration works with projectile.  To work with
 other project management package, you need to customize
-src_emacs-lisp{project-shells-project-name-func} and
-src_emacs-lisp{project-shells-project-root-func}.
+~project-shells-project-name-func~ and
+~project-shells-project-root-func~.
 
 ** Shell configuration
 
@@ -76,11 +75,10 @@ In the default configuration, each shell program and eshell runs by
 project-shells will has own history file.  The default history file
 name is "~/.sessions/<project name>/<key>/.shell_history".  The
 default configuration works for bash, to support other shell, the
-src_emacs-lisp{project-shells-histfile-env} may need to be customized.
+~project-shells-histfile-env~ may need to be customized.
 
 If some special shell configuration is needed, the shell initialize
 file could be added into the session directory, the default initialize
 file name is "~/.sessions/<project name>/<key>/.shellrc".  The default
 configuration works for bash, to support other shell, the
-src_emacs-lisp{project-shells-default-init-file} may need to be
-customized.
+~project-shells-default-init-file~ may need to be customized.
