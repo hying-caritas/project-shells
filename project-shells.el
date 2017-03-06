@@ -161,6 +161,11 @@ should be a subset of poject-shells-keys."
   :group 'project-shells
   :type '(repeat string))
 
+(defcustom project-shells-keymap-prefix "C-c s"
+  "project-shells keymap prefix."
+  :group 'project-shells
+  :type 'string)
+
 (let ((saved-shell-buffer-list nil)
       (last-shell-name nil))
   (cl-defun project-shells--buffer-list ()
@@ -298,6 +303,7 @@ name, and the project root directory."
 		   project-shells-project-root proj-root)
 	     (when project-shells-default-init-func
 	       (funcall project-shells-default-init-func session-dir type))
+	     (project-shells-mode)
 	     (when func
 	       (funcall func session-dir)))
 	 (project-shells--restore-shell-env saved-env))))))
@@ -322,6 +328,35 @@ project-shells-setup."
   (cl-loop
    for key in project-shells-keys
    do (define-key map (kbd key) 'project-shells-activate)))
+
+;;; Minor mode
+
+(defvar project-shells-map
+  (let ((map (make-sparse-keymap)))
+    (project-shells-setup map)
+    (define-key map (kbd "s") 'project-shells-switch-to-last)
+    map)
+  "Sub-keymap for project-shells mode.")
+(fset 'project-shells-map project-shells-map)
+
+(defvar project-shells-mode-map
+  (let ((sub-map (make-sparse-keymap))
+	(map (make-sparse-keymap)))
+    (project-shells-setup sub-map)
+    (define-key map (kbd project-shells-keymap-prefix)
+      'project-shells-map)
+    map)
+  "Keymap for project-shells mode.")
+
+;;;###autoload
+(define-minor-mode project-shells-mode
+  nil
+  :keymap project-shells-mode-map
+  :group project-shells)
+
+;;;###autoload
+(define-globalized-minor-mode global-project-shells-mode
+  project-shells-mode project-shells-mode)
 
 (provide 'project-shells)
 
