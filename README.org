@@ -18,8 +18,11 @@ buffers.
 
 ** Install
 
-Download the project-shells.el, add its path into emacs load path, and
-load the file.  For example, add
+The preferred install method is through package manager: package.el.
+project-shells is available in [[http://melpa.org/][MELPA]] package repository.
+
+Or you can download the project-shells.el, add its path into emacs
+load path, and load the file.  For example, add
 
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path "<directory of project-shells.el>")
