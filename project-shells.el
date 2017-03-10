@@ -203,10 +203,11 @@ should be a subset of poject-shells-keys."
   (cl-defun project-shells--create (name dir &optional (type 'shell))
     (let ((default-directory (expand-file-name (or dir "~/"))))
       (cl-ecase type
-	(term (ansi-term "/bin/sh"))
-	(shell (shell))
-	(eshell (eshell)))
-      (rename-buffer name)
+	(term (ansi-term "/bin/sh")
+	      (rename-buffer name))
+	(shell (shell name))
+	(eshell (let ((eshell-buffer-name name))
+		  (eshell))))
       (push (current-buffer) saved-shell-buffer-list))))
 
 (cl-defun project-shells-send-shell-command (cmdline)
