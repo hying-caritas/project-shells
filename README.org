@@ -90,4 +90,4 @@ If some special shell configuration is needed, the shell initialize
 file could be added into the session directory, the default initialize
 file name is "~/.sessions/<project name>/<key>/.shellrc".  The default
 configuration works for bash, to support other shell, the
-~project-shells-default-init-file~ may need to be customized.
+~project-shells-default-init-func~ may need to be customized.
