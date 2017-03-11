@@ -60,7 +60,13 @@ The default <shell key>s are "1", "2", "3", "4", "5", "6", "7", "8",
 for each project.  You can change the number of buffers and keys to
 activate them via customizing ~project-shells-keys~.  By default "1" -
 "0" will create shell buffers, "-" will create terminal buffers, "="
-will create eshell buffers.
+will create eshell buffers.  You can customize which keys to create
+terminal, eshell buffers via customize the following variables,
+
+#+BEGIN_SRC emacs-lisp
+project-shells-term-keys
+project-shells-eshell-keys
+#+END_SRC
 
 To create or switch to the global shells, you need to use position
 parameter for the <shell key>.  For example,
