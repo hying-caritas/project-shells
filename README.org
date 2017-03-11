@@ -108,3 +108,33 @@ use ~ask~ (symbol ask) as default directory, and you will be prompted
 for destination user@host.
 
 The ssh support code is based on Ian Eure's nssh.  Thanks Ian!
+
+** Example configuration
+
+One of the most important configuration for project-shells is
+~project-shells-setup~.  It could be set via customizing or setting in
+Emacs lisp directly.  The following is the example for the Linux
+kernel development described at the begin of the document.
+
+#+BEGIN_SRC emacs-lisp
+(setf project-shells-setup
+ `(("linux" .
+    (("0" .
+      ("build" "~/projects/linux/obj"))
+     ("9" .
+      ("qemu" "~/projects/linux/qemu"))
+     ("8" .
+      ("guest" "/ssh:root@qemu:"))
+     ("1" .
+      ("git"))))))
+#+END_SRC
+
+Where 4 shell buffers are configured for project "linux", they can be
+activated via key "0", "9", "8", and "1".  The name in configuration
+reflects the intended usage.  Different initial directory is specified
+for "0", and "9", because that is more convenient for the
+corresponding intended usage, for example, there may be some qemu
+scripts in ~/projects/linux/qemu.  "8" is a ssh shell buffer, which is
+used to ssh into the testing guest system running in qemu.  The usage
+is quite simple, just start the qemu in "9", then when you activate
+"8", ssh will be run in the buffer.
