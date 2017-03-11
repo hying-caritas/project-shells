@@ -302,33 +302,33 @@ name, and the project root directory."
 	     (session-dir (expand-file-name (format "%s/%s" proj key)
 					    project-shells-session-root))
 	     (saved-env (project-shells--set-shell-env session-dir)))
-       (unwind-protect
-	   (progn
-	     (mkdir session-dir t)
-	     (when (eq dir 'ask)
-	       (let* ((dest (completing-read
-			     "Destination: "
-			     project-shells--dest-history
-			     nil nil nil 'project-shells--dest-history)))
-		 (setf dir (if (or (string-prefix-p "/" dest)
-				   (string-prefix-p "~" dest))
-			       dest
-			     (format "/ssh:%s:" dest)))))
-	     (project-shells--create shell-name dir type)
-	     (when (eq type 'term)
-	       (term-send-raw-string (project-shells--term-command-string)))
-	     (when (or (string-prefix-p "/ssh:" dir)
-		       (string-prefix-p "/sudo:" dir))
-	       (set-process-sentinel (get-buffer-process (current-buffer))
-				     #'shell-write-history-on-exit))
-	     (setf project-shells-project-name proj
-		   project-shells-project-root proj-root)
-	     (when project-shells-default-init-func
-	       (funcall project-shells-default-init-func session-dir type))
-	     (project-shells-mode)
-	     (when func
-	       (funcall func session-dir)))
-	 (project-shells--restore-shell-env saved-env))))))
+	(unwind-protect
+	    (progn
+	      (mkdir session-dir t)
+	      (when (eq dir 'ask)
+		(let* ((dest (completing-read
+			      "Destination: "
+			      project-shells--dest-history
+			      nil nil nil 'project-shells--dest-history)))
+		  (setf dir (if (or (string-prefix-p "/" dest)
+				    (string-prefix-p "~" dest))
+				dest
+			      (format "/ssh:%s:" dest)))))
+	      (project-shells--create shell-name dir type)
+	      (when (eq type 'term)
+		(term-send-raw-string (project-shells--term-command-string)))
+	      (when (or (string-prefix-p "/ssh:" dir)
+			(string-prefix-p "/sudo:" dir))
+		(set-process-sentinel (get-buffer-process (current-buffer))
+				      #'shell-write-history-on-exit))
+	      (setf project-shells-project-name proj
+		    project-shells-project-root proj-root)
+	      (when project-shells-default-init-func
+		(funcall project-shells-default-init-func session-dir type))
+	      (project-shells-mode)
+	      (when func
+		(funcall func session-dir)))
+	  (project-shells--restore-shell-env saved-env))))))
 
 ;;;###autoload
 (cl-defun project-shells-activate (p)
