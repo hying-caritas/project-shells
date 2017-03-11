@@ -97,3 +97,14 @@ file could be added into the session directory, the default initialize
 file name is "~/.sessions/<project name>/<key>/.shellrc".  The default
 configuration works for bash, to support other shell, the
 ~project-shells-default-init-func~ may need to be customized.
+
+** SSH
+
+The shell buffer could be a remote shell buffer, that is, a ssh
+session accessing a remote machine.  To make a shell buffer remote,
+use something like ~/ssh:<user>@<host>:<dir>~ as the default directory
+when configure shell buffers via ~project-shells-setup~.  Or you can
+use ~ask~ (symbol ask) as default directory, and you will be prompted
+for destination user@host.
+
+The ssh support code is based on Ian Eure's nssh.  Thanks Ian!
