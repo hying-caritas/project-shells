@@ -315,7 +315,7 @@ name, and the project root directory."
 	    (progn
 	      (mkdir session-dir t)
 	      (project-shells--create shell-name dir type)
-	      (cl-ecase type
+	      (cl-case type
 		(term
 		 (term-send-raw-string (project-shells--term-command-string)))
 		(eshell
