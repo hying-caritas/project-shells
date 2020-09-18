@@ -97,7 +97,7 @@ function (symbol or lambda)."
 		       :value-type (list :tag "Shell setup"
 					 (string :tag "Name")
 					 (choice :tag "Directory" string (const ask))
-					 (choice :tag "Type" (const term) (const shell))
+					 (choice :tag "Type" (const term) (const shell) (const eshell) (const vterm))
 					 (choice :tag "Function" (const nil) function)))))
 
 (defcustom project-shells-default-init-func 'project-shells-init-sh
