@@ -248,11 +248,20 @@ used in shell initialized function."
 	     (funcall project-shells-project-root-func))
 	"~/")))
 
-(cl-defun project-shells--setenv (env val)
-  (when env
-    (prog1
-	(list (list env (getenv env)))
-      (setenv env val))))
+(defmacro project-shells--with-process-environment (session-dir &rest body)
+  (declare (indent 1))
+  `(let ((orig-buffer (current-buffer))
+         (orig-env process-environment)
+         (orig-global-env (default-value 'process-environment)))
+     (project-shells--set-shell-env ,session-dir)
+     (when (local-variable-p 'process-environment)
+       (setq-default process-environment process-environment))
+     (unwind-protect
+         ,@body
+       (with-current-buffer orig-buffer
+         (setq process-environment orig-env)
+         (when (local-variable-p 'process-environment)
+           (setq-default process-environment orig-global-env))))))
 
 (cl-defun project-shells--histfile-name (session-dir)
   (when project-shells-histfile-name
@@ -260,13 +269,8 @@ used in shell initialized function."
 
 (cl-defun project-shells--set-shell-env (session-dir)
   (when project-shells-histfile-name
-    (project-shells--setenv project-shells-histfile-env
-			    (project-shells--histfile-name session-dir))))
-
-(cl-defun project-shells--restore-shell-env (saved-env)
-  (cl-loop
-   for env-val in (reverse saved-env)
-   do (apply #'setenv env-val)))
+    (setenv project-shells-histfile-env
+	    (project-shells--histfile-name session-dir))))
 
 (cl-defun project-shells--command-string (args)
   (mapconcat
@@ -302,8 +306,7 @@ name, and the project root directory."
 	     (dir (or (cl-second shell-info) proj-root))
 	     (func (cl-fourth shell-info))
 	     (session-dir (expand-file-name (format "%s/%s" proj key)
-					    project-shells-session-root))
-	     (saved-env nil))
+					    project-shells-session-root)))
 	(when (eq dir 'ask)
 	  (let* ((dest (completing-read
 			"Destination: "
@@ -313,30 +316,27 @@ name, and the project root directory."
 			      (string-prefix-p "~" dest))
 			  dest
 			(format "/ssh:%s:" dest)))))
-	(setf saved-env (project-shells--set-shell-env session-dir))
-	(unwind-protect
-	    (progn
-	      (mkdir session-dir t)
-	      (project-shells--create shell-name dir type)
-	      (cl-case type
-		(term
-		 (term-send-raw-string (project-shells--term-command-string)))
-		(eshell
-		 (setq-local eshell-history-file-name
-			     (project-shells--histfile-name session-dir))
-		 (eshell-read-history)))
-	      (when (or (string-prefix-p "/ssh:" dir)
-			(string-prefix-p "/sudo:" dir))
-		(set-process-sentinel (get-buffer-process (current-buffer))
-				      #'shell-write-history-on-exit))
-	      (setf project-shells-project-name proj
-		    project-shells-project-root proj-root)
-	      (when project-shells-default-init-func
-		(funcall project-shells-default-init-func session-dir type))
-	      (project-shells-mode)
-	      (when func
-		(funcall func session-dir)))
-	  (project-shells--restore-shell-env saved-env))))))
+	(project-shells--with-process-environment session-dir
+	  (mkdir session-dir t)
+	  (project-shells--create shell-name dir type)
+	  (cl-case type
+	    (term
+	     (term-send-raw-string (project-shells--term-command-string)))
+	    (eshell
+	     (setq-local eshell-history-file-name
+			 (project-shells--histfile-name session-dir))
+	     (eshell-read-history)))
+	  (when (or (string-prefix-p "/ssh:" dir)
+		    (string-prefix-p "/sudo:" dir))
+	    (set-process-sentinel (get-buffer-process (current-buffer))
+				  #'shell-write-history-on-exit))
+	  (setf project-shells-project-name proj
+		project-shells-project-root proj-root)
+	  (when project-shells-default-init-func
+	    (funcall project-shells-default-init-func session-dir type))
+	  (project-shells-mode)
+	  (when func
+	    (funcall func session-dir)))))))
 
 ;;;###autoload
 (cl-defun project-shells-activate (p)
