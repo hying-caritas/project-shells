@@ -66,6 +66,7 @@ terminal, eshell buffers via customize the following variables,
 #+BEGIN_SRC emacs-lisp
 project-shells-term-keys
 project-shells-eshell-keys
+project-shells-vterm-keys
 #+END_SRC
 
 To create or switch to the global shells, you need to use position

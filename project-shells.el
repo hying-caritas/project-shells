@@ -111,6 +111,14 @@ be bound in a non-global keymap."
   :group 'project-shells
   :type '(repeat string))
 
+(defcustom project-shells-vterm-keys nil
+  "Keys used to create vterm buffers.
+
+One vterm will be created for each key.  Usually these key will
+be bound in a non-global keymap."
+  :group 'project-shells
+  :type '(repeat string))
+
 (defcustom project-shells-term-keys '("-")
   "Keys used to create terminal buffers.
 
@@ -298,6 +306,7 @@ name, and the project root directory."
 		    ((cl-third shell-info))
 		    ((member key project-shells-term-keys) 'term)
 		    ((member key project-shells-eshell-keys) 'eshell)
+		    ((member key project-shells-vterm-keys) 'vterm)
 		    (t 'shell)))
 	     (dir (or (cl-second shell-info) proj-root))
 	     (func (cl-fourth shell-info))
